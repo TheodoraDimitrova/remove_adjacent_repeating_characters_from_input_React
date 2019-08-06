@@ -7,21 +7,24 @@ const Home = () => {
 
   const history = createBrowserHistory();
   useEffect(() => {
-    
     if (localStorage.getItem('history') !== null) {
       let data = JSON.parse(localStorage.getItem('history'));
       setHistory({ history: data.history });
-     
-      
     }
+    window.onpopstate = e => {
+      let data = JSON.parse(localStorage.getItem('history'));
+      let last = data.history.pop();
+      setHistory(data);
 
-  
+      setInput(last);
+      localStorage.setItem(
+        'history',
+        JSON.stringify({ history: data.history })
+      );
+    };
 
     // eslint-disable-line
   }, []);
-  window.onpopstate  = (e) => {
-    console.log(userHistory.history)
-  }
 
   const onSubmit = e => {
     e.preventDefault();
@@ -42,13 +45,10 @@ const Home = () => {
     setInput(e.target.value);
   };
   const clear = () => {
-   
     setInput('');
     setResult([]);
   };
   const saveToStorage = () => {
-
-
     let history = userHistory ? userHistory : { history: [] };
     history.history.push(input);
     localStorage.setItem('history', JSON.stringify(history));
