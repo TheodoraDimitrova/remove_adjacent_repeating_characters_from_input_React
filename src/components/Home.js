@@ -1,30 +1,25 @@
-import React, { Fragment, useState,useEffect } from 'react';
-import { createBrowserHistory } from 'history';
- 
+import React, { Fragment, useState, useEffect } from 'react';
 
-
-const Home = ({ match }) => {
+const Home = props => {
   const [input, setInput] = useState('');
   const [result, setResult] = useState([]);
+  const [userHistory, setHistory] = useState({ history: [] });
 
 
   useEffect(() => {
-    const history = createBrowserHistory();
-    window.onpopstate  = (e) => {
-      if(history.action==="POP"){
-        console.log(history.location)
-         
-      }
+    if (localStorage.getItem('history') !== null) {
+ 
+      let data = JSON.parse(localStorage.getItem('history'));
+      setHistory({ history: data.history });
+      
+    }
 
-      }
-    
-  // eslint-disable-line
-  }, [])
- 
- 
+    // eslint-disable-line
+  }, []);
+
   const onSubmit = e => {
     e.preventDefault();
-    const history = createBrowserHistory();
+
     let arr = input.split(', ').map(function(item) {
       return parseInt(item, 10);
     });
@@ -34,16 +29,12 @@ const Home = ({ match }) => {
       result.push(arr[i]);
     }
     setResult(result);
-    history.push(`/:${input}`, { input });
-    console.log(history.action,history.location.state.input,history)
-   
-    
+    saveToStorage();
   };
   const onChange = e => {
     setInput(e.target.value);
   };
   const clear = () => {
-   
     // const unlisten = history.listen((location, action) => {
     //   console.log(action, location.pathname, location.state);
 
@@ -53,24 +44,29 @@ const Home = ({ match }) => {
     setInput('');
     setResult([]);
   };
- 
+  const saveToStorage = () => {
+
+
+    let history = userHistory ? userHistory : { history: [] };
+    history.history.push(input);
+    localStorage.setItem('history', JSON.stringify(history));
+  };
 
   return (
     <div>
       <Fragment>
-      <form onSubmit={onSubmit}>
-        <input
-          value={input}
-          onChange={onChange}
-          pattern="^\d(, ?\d)*$"
-          title="Enter numbers separated by coma & space"
-          required
-        />
-        <input type="submit" value="Remove" />
-      </form>
-      
+        <form onSubmit={onSubmit}>
+          <input
+            value={input}
+            onChange={onChange}
+            pattern="^\d(, ?\d)*$"
+            title="Enter numbers separated by coma & space"
+            required
+          />
+          <input type="submit" value="Remove" />
+        </form>
       </Fragment>
-    
+
       {result.length > 1 && (
         <Fragment>
           <h1>{result}</h1>
