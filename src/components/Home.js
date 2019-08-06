@@ -1,21 +1,27 @@
 import React, { Fragment, useState, useEffect } from 'react';
-
-const Home = props => {
+import { createBrowserHistory } from 'history';
+const Home = () => {
   const [input, setInput] = useState('');
   const [result, setResult] = useState([]);
   const [userHistory, setHistory] = useState({ history: [] });
 
-
+  const history = createBrowserHistory();
   useEffect(() => {
+    
     if (localStorage.getItem('history') !== null) {
- 
       let data = JSON.parse(localStorage.getItem('history'));
       setHistory({ history: data.history });
+     
       
     }
 
+  
+
     // eslint-disable-line
   }, []);
+  window.onpopstate  = (e) => {
+    console.log(userHistory.history)
+  }
 
   const onSubmit = e => {
     e.preventDefault();
@@ -29,18 +35,14 @@ const Home = props => {
       result.push(arr[i]);
     }
     setResult(result);
+    history.push('/', { userInput: input });
     saveToStorage();
   };
   const onChange = e => {
     setInput(e.target.value);
   };
   const clear = () => {
-    // const unlisten = history.listen((location, action) => {
-    //   console.log(action, location.pathname, location.state);
-
-    // });
-
-    //unlisten();
+   
     setInput('');
     setResult([]);
   };
